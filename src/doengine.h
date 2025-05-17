@@ -89,7 +89,6 @@ enum TGAME_ERROR {
 
 #include "dosimpletypes.h"
 #include "domap.h"
-#include "dohost.h"
 
 //=========================================================================
 // Defines
@@ -392,21 +391,21 @@ private:
 //========================================================================
 
 // GLWF callbacks
-#ifdef NEW_GLFW3
+// #ifdef NEW_GLFW3
 void GLFWCALL SizeCallback(GLFWwindow* window, int w, int h);
 void GLFWCALL KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void GLFWCALL MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void GLFWCALL MousePosCallback(GLFWwindow* window, double x, double y);
 void GLFWCALL MouseWheelCallback(GLFWwindow* window, double xoffset, double yoffset);
 void GLFWCALL WindowRefreshCallback (GLFWwindow* window);
-#else
-void GLFWCALL SizeCallback(int w, int h);
-void GLFWCALL KeyCallback(int key, int action);
-void GLFWCALL MouseButtonCallback(int button, int action);
-void GLFWCALL MousePosCallback(int x, int y);
-void GLFWCALL MouseWheelCallback(int pos);
-void GLFWCALL WindowRefreshCallback ();
-#endif
+// #else
+// void GLFWCALL SizeCallback(int w, int h);
+// void GLFWCALL KeyCallback(int key, int action);
+// void GLFWCALL MouseButtonCallback(int button, int action);
+// void GLFWCALL MousePosCallback(int x, int y);
+// void GLFWCALL MouseWheelCallback(int pos);
+// void GLFWCALL WindowRefreshCallback ();
+// #endif
 
 
 // engine methods

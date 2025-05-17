@@ -26,8 +26,7 @@
  */
 
 
-#ifndef __dofile_h__
-#define __dofile_h__
+#pragma once
 
 //========================================================================
 // Forward declarations
@@ -323,8 +322,6 @@ TCONF_FILE *CreateConfFile(const char *name);
 TCONF_FILE *OpenConfFile(const char *name);
 void CloseConfFile(TCONF_FILE *&cf);
 
-
-#endif // __dofile_h__
 
 //========================================================================
 // End

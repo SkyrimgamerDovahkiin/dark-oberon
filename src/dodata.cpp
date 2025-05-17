@@ -2,7 +2,7 @@
  * -------------
  *  Dark Oberon
  * -------------
- * 
+ *
  * An advanced strategy game.
  *
  * Copyright (C) 2002 - 2005 Valeria Sventova, Jiri Krejsa, Peter Knut,
@@ -28,9 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef __MINGW32__
-#include <GL/glu.h>
-#endif
+// #ifdef __MINGW32__
+// #include <GL/glu.h>
+// #endif
 
 #include "doconfig.h"
 #include "dodata.h"
@@ -38,30 +38,26 @@
 #include "domouse.h"
 #include "tga.h"
 
-
 //=========================================================================
 // Defines
 //=========================================================================
 
 // sound types
-#define DAT_ST_MODULE   -1
-#define DAT_ST_SAMPLE   0
-#define DAT_ST_STREAM   1
-
+#define DAT_ST_MODULE -1
+#define DAT_ST_SAMPLE 0
+#define DAT_ST_STREAM 1
 
 //=========================================================================
 // Global variables
 //=========================================================================
 
-TTEX_TABLE fonts_table;       //!< Textures used by fonts.
-TTEX_TABLE gui_table;         //!< Common texures used for gui objects.
+TTEX_TABLE fonts_table; //!< Textures used by fonts.
+TTEX_TABLE gui_table;   //!< Common texures used for gui objects.
 #if SOUND
-TSND_TABLE sounds_table;      //!< Common sounds used in menu and game.
+TSND_TABLE sounds_table; //!< Common sounds used in menu and game.
 #endif
 
-
-GLFfont  *font0 = NULL;       //!< Basic font.
-
+GLFfont *font0 = NULL; //!< Basic font.
 
 //=========================================================================
 // Useful Methods.
@@ -73,15 +69,15 @@ bool fReadString(char **txt, FILE *fr)
 
   fread(&len, sizeof(len), 1, fr);
 
-  if (len) {
-    *txt = NEW char[len+1];
+  if (len)
+  {
+    *txt = NEW char[len + 1];
     fread(*txt, sizeof(char), len, fr);
     (*txt)[len] = 0;
   }
 
   return (len > 0);
 }
-
 
 //=========================================================================
 // TTEX_TABLE
@@ -97,10 +93,11 @@ bool fReadString(char **txt, FILE *fr)
 bool TTEX_TABLE::Load(const char *file_name, int mag_filter, int min_filter)
 {
   FILE *fr;
-  
+
   Info(LogMsg("Loading textures from '%s'", file_name));
 
-  if (!(fr = fopen(file_name, "rb"))) {
+  if (!(fr = fopen(file_name, "rb")))
+  {
     Error(LogMsg("Can not open file '%s'", file_name));
     return false;
   }
@@ -108,24 +105,25 @@ bool TTEX_TABLE::Load(const char *file_name, int mag_filter, int min_filter)
   TGA_INFO tga;
   int format, iformat;
 
-  char   header[257];
+  char header[257];
   T_BYTE version;
-  long   textures_seek = 0;
+  long textures_seek = 0;
 
-  int   tid, gid;   // texture id, group id
+  int tid, gid; // texture id, group id
   TGUI_TEXTURE *tex;
 
-  int    atime;                            // animation time [miliseconds]
-  T_BYTE ttype;                            // texture type
-  T_BYTE hcount;                           // horizontal frames count
-  T_BYTE vcount;                           // vertical frames count
-  int   pointx, pointy;
-  unsigned int dsize;                     // data size
+  int atime;     // animation time [miliseconds]
+  T_BYTE ttype;  // texture type
+  T_BYTE hcount; // horizontal frames count
+  T_BYTE vcount; // vertical frames count
+  int pointx, pointy;
+  unsigned int dsize; // data size
 
   // file header
   fread(header, sizeof(char), strlen(DAT_FILE_HEADER), fr);
   header[strlen(DAT_FILE_HEADER)] = 0;
-  if (strcmp(header, DAT_FILE_HEADER)) {
+  if (strcmp(header, DAT_FILE_HEADER))
+  {
     fclose(fr);
     return false;
   }
@@ -133,7 +131,8 @@ bool TTEX_TABLE::Load(const char *file_name, int mag_filter, int min_filter)
   // file version
   fread(&version, sizeof(version), 1, fr);
 
-  if (version > DAT_MAX_VERSION || version < DAT_MIN_VERSION) {
+  if (version > DAT_MAX_VERSION || version < DAT_MIN_VERSION)
+  {
     Error(LogMsg("Version of data file '%s' is not allowed", file_name));
     fclose(fr);
     return false;
@@ -142,7 +141,8 @@ bool TTEX_TABLE::Load(const char *file_name, int mag_filter, int min_filter)
   // seeks
   fread(&textures_seek, sizeof(textures_seek), 1, fr);
 
-  if (!textures_seek) {
+  if (!textures_seek)
+  {
     Error(LogMsg("Data file '%s' does not contain any textures", file_name));
     fclose(fr);
     return false;
@@ -154,32 +154,36 @@ bool TTEX_TABLE::Load(const char *file_name, int mag_filter, int min_filter)
   fseek(fr, textures_seek, SEEK_SET);
   fread(&count, sizeof(count), 1, fr);
 
-  if (!(groups = NEW TTEX_GROUP[count])) {
+  if (!(groups = NEW TTEX_GROUP[count]))
+  {
     Critical(LogMsg("Can not allocate memory for texture groups table from '%s'", file_name));
     fclose(fr);
     return false;
   }
 
   // texture groups
-  for (gid = 0; gid < count; gid++) {
+  for (gid = 0; gid < count; gid++)
+  {
 
     fReadString(&groups[gid].name, fr);
     fread(&groups[gid].count, sizeof(groups[gid].count), 1, fr);
-    
-    if (!(groups[gid].textures = NEW TGUI_TEXTURE[groups[gid].count])) {
+
+    if (!(groups[gid].textures = NEW TGUI_TEXTURE[groups[gid].count]))
+    {
       Critical(LogMsg("Can not allocate memory for texture table from '%s'", file_name));
       fclose(fr);
       return false;
     }
 
     // textures
-    for (tid = 0; tid < groups[gid].count; tid++) {
+    for (tid = 0; tid < groups[gid].count; tid++)
+    {
       tex = groups[gid].textures + tid;
 
       // read values from file
       fReadString(&tex->id, fr);
       fread(&hcount, sizeof(hcount), 1, fr);
-      fread(&vcount, sizeof(vcount), 1, fr);     
+      fread(&vcount, sizeof(vcount), 1, fr);
       fread(&atime, sizeof(atime), 1, fr);
       fread(&pointx, sizeof(pointx), 1, fr);
       fread(&pointy, sizeof(pointy), 1, fr);
@@ -190,24 +194,29 @@ bool TTEX_TABLE::Load(const char *file_name, int mag_filter, int min_filter)
       glGenTextures(1, &tex->gl_id);
 
       // read TGA image
-      if (!tgaRead(fr, &tga, TGA_RESCALE)) {
+      if (!tgaRead(fr, &tga, TGA_RESCALE))
+      {
         Error(LogMsg("Error reading TGA data from '%s'", file_name));
         return false;
       }
 
-      if (tga.bytesperpixel == 3) format = iformat = GL_RGB;
-      else format = iformat = GL_RGBA;
+      if (tga.bytesperpixel == 3)
+        format = iformat = GL_RGB;
+      else
+        format = iformat = GL_RGBA;
 
       // generate texture
       glBindTexture(GL_TEXTURE_2D, tex->gl_id);
-    
+
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
 
       // upload to memory
-      if (min_filter == GL_NEAREST || min_filter == GL_LINEAR)
-        glTexImage2D(GL_TEXTURE_2D, 0, iformat, tga.width, tga.height, 0, format, GL_UNSIGNED_BYTE, (void *)tga.data);
-      else gluBuild2DMipmaps(GL_TEXTURE_2D, iformat, tga.width, tga.height, format, GL_UNSIGNED_BYTE, (void *)tga.data);
+      // TODO: later
+      // if (min_filter == GL_NEAREST || min_filter == GL_LINEAR)
+      //   glTexImage2D(GL_TEXTURE_2D, 0, iformat, tga.width, tga.height, 0, format, GL_UNSIGNED_BYTE, (void *)tga.data);
+      // else
+      //   gluBuild2DMipmaps(GL_TEXTURE_2D, iformat, tga.width, tga.height, format, GL_UNSIGNED_BYTE, (void *)tga.data);
 
       // fill texture
       tex->type = (TGUI_TEX_TYPE)ttype;
@@ -237,7 +246,6 @@ bool TTEX_TABLE::Load(const char *file_name, int mag_filter, int min_filter)
   return true;
 }
 
-
 //=========================================================================
 // TSND_TABLE
 //=========================================================================
@@ -245,13 +253,14 @@ bool TTEX_TABLE::Load(const char *file_name, int mag_filter, int min_filter)
 #if SOUND
 bool TSND_TABLE::Load(const char *file_name)
 {
-  if (!file_name) return false;
+  if (!file_name)
+    return false;
 
   Info(LogMsg("Loading sounds from '%s'", file_name));
 
-  char   header[257];
+  char header[257];
   T_BYTE version;
-  int    sounds_seek = 0;
+  int sounds_seek = 0;
   FILE *fr;
   TMODULE *music = NULL;
   TSAMPLE *sample = NULL;
@@ -267,7 +276,8 @@ bool TSND_TABLE::Load(const char *file_name)
 
   Clear();
 
-  if (!(fr = fopen(file_name, "rb"))) {
+  if (!(fr = fopen(file_name, "rb")))
+  {
     Error(LogMsg("Can not open file '%s'", file_name));
     return false;
   }
@@ -275,7 +285,8 @@ bool TSND_TABLE::Load(const char *file_name)
   // file header
   fread(header, sizeof(char), strlen(DAT_FILE_HEADER), fr);
   header[strlen(DAT_FILE_HEADER)] = 0;
-  if (strcmp(header, DAT_FILE_HEADER)) {
+  if (strcmp(header, DAT_FILE_HEADER))
+  {
     fclose(fr);
     return false;
   }
@@ -283,7 +294,8 @@ bool TSND_TABLE::Load(const char *file_name)
   // file version
   fread(&version, sizeof(version), 1, fr);
 
-  if (version > DAT_MAX_VERSION || version < DAT_MIN_VERSION) {
+  if (version > DAT_MAX_VERSION || version < DAT_MIN_VERSION)
+  {
     Error(LogMsg("Version of data file '%s' is not allowed", file_name));
     fclose(fr);
     return false;
@@ -291,10 +303,13 @@ bool TSND_TABLE::Load(const char *file_name)
 
   // seeks
   fread(&sounds_seek, sizeof(sounds_seek), 1, fr); // textures
-  if (version > 2) fread(&sounds_seek, sizeof(sounds_seek), 1, fr); // sounds
-  else sounds_seek = 0;
+  if (version > 2)
+    fread(&sounds_seek, sizeof(sounds_seek), 1, fr); // sounds
+  else
+    sounds_seek = 0;
 
-  if (!sounds_seek) {
+  if (!sounds_seek)
+  {
     Error(LogMsg("Data file '%s' does not contain any sounds", file_name));
     fclose(fr);
     return false;
@@ -304,16 +319,19 @@ bool TSND_TABLE::Load(const char *file_name)
   fseek(fr, sounds_seek, SEEK_SET);
   fread(&count, sizeof(count), 1, fr);
 
-  if (!(sounds = NEW TSOUND *[count])) {
+  if (!(sounds = NEW TSOUND *[count]))
+  {
     Critical(LogMsg("Can not allocate memory for sounds table from '%s'", file_name));
     fclose(fr);
     return false;
   }
 
-  for (sid = 0; sid < count; sid++) sounds[sid] = NULL;
+  for (sid = 0; sid < count; sid++)
+    sounds[sid] = NULL;
 
   // sounds
-  for (sid = 0; sid < count; sid++) {
+  for (sid = 0; sid < count; sid++)
+  {
     music = NULL;
     sample = NULL;
     data = NULL;
@@ -325,7 +343,8 @@ bool TSND_TABLE::Load(const char *file_name)
     fread(&dsize, sizeof(dsize), 1, fr);
     dseek = ftell(fr);
 
-    switch (stype) {
+    switch (stype)
+    {
     case DAT_ST_MODULE:
       music = NEW TMODULE();
       sounds[sid] = music;
@@ -350,26 +369,31 @@ bool TSND_TABLE::Load(const char *file_name)
     snd->format = (TSOUND_FORMAT)sformat;
 
     // load data
-    if (stype != DAT_ST_STREAM) {
-      if (!(data = NEW char[dsize])) {
+    if (stype != DAT_ST_STREAM)
+    {
+      if (!(data = NEW char[dsize]))
+      {
         Critical(LogMsg("Can not allocate memory for sound data from '%s'", file_name));
         Clear();
         return false;
       }
       fread(data, sizeof(char), dsize, fr);
     }
-    else fseek(fr, dsize, SEEK_CUR);
+    else
+      fseek(fr, dsize, SEEK_CUR);
 
     // load sound
-    if (sample) 
+    if (sample)
       sample->Load(data, dsize);
-    else if (music) 
+    else if (music)
       music->Load(data, dsize);
-    else if (stream) 
-      stream->Load(file_name, dseek, dsize);
+    else if (stream)
+      // stream->Load(file_name, dseek, dsize);
+      stream->Load(file_name);
 
     // free data
-    if (data) delete[] data;
+    if (data)
+      delete[] data;
   }
 
   fclose(fr);
@@ -377,13 +401,15 @@ bool TSND_TABLE::Load(const char *file_name)
   return true;
 }
 
-
-void TSND_TABLE::Clear(void) { 
+void TSND_TABLE::Clear(void)
+{
   int i;
 
-  if (sounds) {
+  if (sounds)
+  {
     for (i = 0; i < count; i++)
-      if (sounds[i]) delete sounds[i];
+      if (sounds[i])
+        delete sounds[i];
 
     delete[] sounds;
     sounds = NULL;
@@ -392,15 +418,16 @@ void TSND_TABLE::Clear(void) {
   count = 0;
 };
 
-TSOUND * TSND_TABLE::GetSound(char * id) {
+TSOUND *TSND_TABLE::GetSound(char *id)
+{
   int i;
 
   for (i = 0; i < count; i++)
-    if (!(strcmp(id, sounds[i]->id))) return sounds[i];
-  
+    if (!(strcmp(id, sounds[i]->id)))
+      return sounds[i];
+
   return NULL;
 }
-
 
 #endif
 
@@ -421,7 +448,7 @@ bool LoadData(void)
 #if SOUND
       && sounds_table.Load(DAT_GUI_NAME)
 #endif
-      )
+  )
   {
 #if SOUND
     PrepareSounds();
@@ -430,7 +457,8 @@ bool LoadData(void)
     return true;
   }
 
-  else {
+  else
+  {
     DeleteData();
     Critical("Can not load data.");
     return false;
@@ -450,8 +478,6 @@ void DeleteData(void)
   sounds_table.Clear();
 #endif
 }
-
-
 
 //=========================================================================
 // Fonts data
@@ -474,12 +500,12 @@ bool CreateFonts(void)
     glfSetFontBase(font0, 32, 32 - 96);
     return true;
   }
-  else {
+  else
+  {
     Critical("Can not create fonts");
     return false;
   }
 }
-
 
 /**
  *   Destroys fonts structures.
@@ -489,9 +515,7 @@ void DestroyFonts(void)
   glfDeleteFont(font0);
 }
 
-
 //=========================================================================
 // END
 //=========================================================================
 // vim:ts=2:sw=2:et:
-

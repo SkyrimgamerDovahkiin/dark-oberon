@@ -110,11 +110,7 @@ enum TGUI_SLIDER_TYPE {
 // Included files
 //=========================================================================
 
-#ifdef NEW_GLFW3
 #include <glfw3.h>
-#else
-#include <glfw.h>
-#endif
 
 #include <stdio.h>
 #include <string.h>

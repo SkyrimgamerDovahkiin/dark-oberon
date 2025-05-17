@@ -86,12 +86,8 @@ class TQUEUE_EVENTS;
 // Included files
 //========================================================================
 
-#ifdef NEW_GLFW3
 #include <glfw3.h>
-#include <tinycthread.h>
-#else
-#include <glfw.h>
-#endif
+// #include <tinycthread.h> // TODO: replace with C++ thread
 
 #include <string.h>
 
@@ -195,11 +191,12 @@ private:
   TEVENT *events;         //!< List of events in the queue.
   TEVENT *prior_events;   //!< List of events in the queue.
   int count;              //!< Count of events in the queue.
-#ifdef NEW_GLFW3
-	mtx_t mutex;
-#else
-	GLFWmutex mutex;        //!< Queue mutex.
-#endif
+  std::mutex mutex; //!< Queue mutex.
+//   #ifdef NEW_GLFW3
+// 	mtx_t mutex;
+// #else
+// 	GLFWmutex mutex;        //!< Queue mutex.
+// #endif
   
 
 public:
@@ -228,11 +225,12 @@ public:
 extern TPOOL<TEVENT> * pool_events;
 extern TQUEUE_EVENTS * queue_events;
 
-#ifdef NEW_GLFW3
-extern mtx_t delete_mutex;
-#else
-extern GLFWmutex delete_mutex;
-#endif
+// #ifdef NEW_GLFW3
+// extern mtx_t delete_mutex;
+// #else
+// extern GLFWmutex delete_mutex;
+// #endif
+std::mutex delete_mutex;
 
 
 //========================================================================

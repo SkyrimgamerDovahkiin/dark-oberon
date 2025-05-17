@@ -17,7 +17,7 @@
 /**
  *  @file doalloc.cpp
  *
- *  
+ *
  *
  *  @author Peter Knut
  *
@@ -26,305 +26,305 @@
 
 #include "doalloc.h"
 
-#if DEBUG_MEMORY
+// #if DEBUG_MEMORY
 
-#include "dologs.h"
-#include <glfw.h>
-#include <crtdbg.h>
-#include <malloc.h>
+// // #include "dologs.h"
+// // #include <glfw.h>
+// // #include <crtdbg.h>
+// // #include <malloc.h>
 
 
-bool alloc_logging = false;
+// bool alloc_logging = false;
 
 
-//========================================================================
-// Structures
-//========================================================================
+// //========================================================================
+// // Structures
+// //========================================================================
 
-/**
- *  Stores information about one allocated block
- */
-struct TMEMORY_BLOCK {
-  void *address;          //!< Block address in memory.
-  size_t size;            //!< Size of allocated block.
-  const char *file;       //!< File from which was block allocated.
-  int line;               //!< Line from which was block allocated.
+// /**
+//  *  Stores information about one allocated block
+//  */
+// struct TMEMORY_BLOCK {
+//   void *address;          //!< Block address in memory.
+//   size_t size;            //!< Size of allocated block.
+//   const char *file;       //!< File from which was block allocated.
+//   int line;               //!< Line from which was block allocated.
 
-  TMEMORY_BLOCK *next;    //!< Pointer to next block.
-  TMEMORY_BLOCK *prev;    //!< Pointer to previous block.
-};
+//   TMEMORY_BLOCK *next;    //!< Pointer to next block.
+//   TMEMORY_BLOCK *prev;    //!< Pointer to previous block.
+// };
 
 
-//========================================================================
-// Variables
-//========================================================================
+// //========================================================================
+// // Variables
+// //========================================================================
 
-TMEMORY_BLOCK *memory_list = NULL;  //!< Head of blocks list.
-TMEMORY_BLOCK *memory_back = NULL;  //!< Back of block list.
+// TMEMORY_BLOCK *memory_list = NULL;  //!< Head of blocks list.
+// TMEMORY_BLOCK *memory_back = NULL;  //!< Back of block list.
 
-bool check_blocks = false;          //!< Whether checking is initialized.
-unsigned total_count = 0;           //!< Total count of allocated blocks.
-size_t total_size = 0;              //!< Total size of allocated blocks.
+// bool check_blocks = false;          //!< Whether checking is initialized.
+// unsigned total_count = 0;           //!< Total count of allocated blocks.
+// size_t total_size = 0;              //!< Total size of allocated blocks.
 
-GLFWmutex mutex = NULL;
+// GLFWmutex mutex = NULL;
 
 
-//========================================================================
-// Methods
-//========================================================================
+// //========================================================================
+// // Methods
+// //========================================================================
 
-/**
- *  Check undeleted blocks and write info to log files.
- */
-void CheckMemory(void)
-{
-  TMEMORY_BLOCK *iter;
-  unsigned count = 0;
-  size_t size = 0;
+// /**
+//  *  Check undeleted blocks and write info to log files.
+//  */
+// void CheckMemory(void)
+// {
+//   TMEMORY_BLOCK *iter;
+//   unsigned count = 0;
+//   size_t size = 0;
 
-  glfwLockMutex(mutex);
+//   glfwLockMutex(mutex);
 
-  Debug("*** MEMORY BEGIN ***");
+//   Debug("*** MEMORY BEGIN ***");
 
-  for (iter = memory_list; iter; iter = iter->next) {
-    if (iter->file)
-      Debug(LogMsg("Undeleted block: %8d   %s:%d", iter->size, iter->file, iter->line));
-    else
-      Debug(LogMsg("Undeleted block: %8d", iter->size));
+//   for (iter = memory_list; iter; iter = iter->next) {
+//     if (iter->file)
+//       Debug(LogMsg("Undeleted block: %8d   %s:%d", iter->size, iter->file, iter->line));
+//     else
+//       Debug(LogMsg("Undeleted block: %8d", iter->size));
 
-    count++;
-    size += iter->size;
-  }
+//     count++;
+//     size += iter->size;
+//   }
 
-  while (memory_list) {
-    iter = memory_list;
-    memory_list = memory_list->next;
-    free(iter);
-  }
+//   while (memory_list) {
+//     iter = memory_list;
+//     memory_list = memory_list->next;
+//     free(iter);
+//   }
 
-  memory_list = memory_back = NULL;
+//   memory_list = memory_back = NULL;
 
-  Debug("*** MEMORY END ***");
-  Debug(LogMsg("*** Total blocks:     %d", total_count));
-  Debug(LogMsg("*** Undeleted blocks: %d (%.2lf%%)", count, ((double)count / total_count) * 100));
-  Debug(LogMsg("*** Total size:       %d", total_size));
-  Debug(LogMsg("*** Undeleted size:   %d (%.2lf%%)", size, ((double)size / total_size) * 100));
+//   Debug("*** MEMORY END ***");
+//   Debug(LogMsg("*** Total blocks:     %d", total_count));
+//   Debug(LogMsg("*** Undeleted blocks: %d (%.2lf%%)", count, ((double)count / total_count) * 100));
+//   Debug(LogMsg("*** Total size:       %d", total_size));
+//   Debug(LogMsg("*** Undeleted size:   %d (%.2lf%%)", size, ((double)size / total_size) * 100));
 
-  glfwUnlockMutex(mutex);
-}
+//   glfwUnlockMutex(mutex);
+// }
 
 
-/**
- *  Initialize memory system.
- */
-void InitMemorySestem(void)
-{
-  mutex = glfwCreateMutex();
+// /**
+//  *  Initialize memory system.
+//  */
+// void InitMemorySestem(void)
+// {
+//   mutex = glfwCreateMutex();
 
-  check_blocks = true;
-}
+//   check_blocks = true;
+// }
 
 
-/**
- *  Finishes memory system and checks undeleted blocks.
- */
-void DoneMemorySystem(void)
-{
-  check_blocks = false;
+// /**
+//  *  Finishes memory system and checks undeleted blocks.
+//  */
+// void DoneMemorySystem(void)
+// {
+//   check_blocks = false;
 
-  CheckMemory();
-  glfwDestroyMutex(mutex);
-}
+//   CheckMemory();
+//   glfwDestroyMutex(mutex);
+// }
 
 
-/**
- *  Set logging of memory allocating.
- */
-void SetAllocLogging(bool log)
-{
-  alloc_logging = log;
-}
+// /**
+//  *  Set logging of memory allocating.
+//  */
+// void SetAllocLogging(bool log)
+// {
+//   alloc_logging = log;
+// }
 
 
-//========================================================================
-// Allocating memory blocks
-//========================================================================
+// //========================================================================
+// // Allocating memory blocks
+// //========================================================================
 
-/**
- *  Allocates new memory block.
- */
-inline
-void *NewBlock(size_t size, const char *file = NULL, int line = 0)
-{
-  void* res;
+// /**
+//  *  Allocates new memory block.
+//  */
+// inline
+// void *NewBlock(size_t size, const char *file = NULL, int line = 0)
+// {
+//   void* res;
 
-  if (file)
-    res = _malloc_dbg(size, _NORMAL_BLOCK, file, line);
-  else
-    res = _malloc_dbg(size, _NORMAL_BLOCK, __FILE__, __LINE__);
+//   if (file)
+//     res = _malloc_dbg(size, _NORMAL_BLOCK, file, line);
+//   else
+//     res = _malloc_dbg(size, _NORMAL_BLOCK, __FILE__, __LINE__);
 
-  if (alloc_logging) {
-    if (file)
-      Debug(LogMsg("New block: %8d   %s:%d", size, file, line));
-    else
-      Debug(LogMsg("New block: %8d", size));
-  }
+//   if (alloc_logging) {
+//     if (file)
+//       Debug(LogMsg("New block: %8d   %s:%d", size, file, line));
+//     else
+//       Debug(LogMsg("New block: %8d", size));
+//   }
 
-  if (!check_blocks) return res;
+//   if (!check_blocks) return res;
 
-  TMEMORY_BLOCK *block = (TMEMORY_BLOCK *)malloc(sizeof TMEMORY_BLOCK);
+//   TMEMORY_BLOCK *block = (TMEMORY_BLOCK *)malloc(sizeof TMEMORY_BLOCK);
 
-  block->address = res;
-  block->size = size;
-  block->file = file;
-  block->line = line;
-  block->next = block->prev = NULL;
+//   block->address = res;
+//   block->size = size;
+//   block->file = file;
+//   block->line = line;
+//   block->next = block->prev = NULL;
 
-  glfwLockMutex(mutex);
+//   glfwLockMutex(mutex);
 
-  total_count++;
-  total_size += size;
+//   total_count++;
+//   total_size += size;
 
-  if (memory_back) {
-    memory_back->next = block;
-    block->prev = memory_back;
-    memory_back = block;
-  }
+//   if (memory_back) {
+//     memory_back->next = block;
+//     block->prev = memory_back;
+//     memory_back = block;
+//   }
 
-  else {
-    memory_list = memory_back = block;
-  }
+//   else {
+//     memory_list = memory_back = block;
+//   }
 
-  glfwUnlockMutex(mutex);
+//   glfwUnlockMutex(mutex);
 
-  return res;
-}
+//   return res;
+// }
 
 
-/**
- *  Deletes memory block.
- */
-inline
-void DeleteBlock(void *address, const char* file = NULL, int line = 0)
-{
-  if (address == NULL) {
-    if (file) Debug(LogMsg("Deleting NULL pointer: %s:%d", file, line));
-    else Debug("Deleting NULL pointer");
+// /**
+//  *  Deletes memory block.
+//  */
+// inline
+// void DeleteBlock(void *address, const char* file = NULL, int line = 0)
+// {
+//   if (address == NULL) {
+//     if (file) Debug(LogMsg("Deleting NULL pointer: %s:%d", file, line));
+//     else Debug("Deleting NULL pointer");
 
-    return;
-  }
-
-  _free_dbg(address, _NORMAL_BLOCK);
+//     return;
+//   }
+
+//   _free_dbg(address, _NORMAL_BLOCK);
 
-  if (!check_blocks) return;
+//   if (!check_blocks) return;
 
-  TMEMORY_BLOCK *iter;
-
-  glfwLockMutex(mutex);
-
-  for (iter = memory_list; iter; iter = iter->next) {
-    if (iter->address == address) break;
-  }
+//   TMEMORY_BLOCK *iter;
+
+//   glfwLockMutex(mutex);
+
+//   for (iter = memory_list; iter; iter = iter->next) {
+//     if (iter->address == address) break;
+//   }
 
-  if (iter) {
-    if (iter == memory_list) memory_list = iter->next;
-    if (iter == memory_back) memory_back = iter->prev;
+//   if (iter) {
+//     if (iter == memory_list) memory_list = iter->next;
+//     if (iter == memory_back) memory_back = iter->prev;
 
-    if (iter->next) iter->next->prev = iter->prev;
-    if (iter->prev) iter->prev->next = iter->next;
+//     if (iter->next) iter->next->prev = iter->prev;
+//     if (iter->prev) iter->prev->next = iter->next;
 
-    //memset(iter->address, 0, iter->size);
+//     //memset(iter->address, 0, iter->size);
 
-    free(iter);
-  }
+//     free(iter);
+//   }
 
-  else {
-    if (file) Debug(LogMsg("Missing block: %8lx   %s:%d", address, file, line));
-    else Debug(LogMsg("Missing block: %lx", address));
-  }
+//   else {
+//     if (file) Debug(LogMsg("Missing block: %8lx   %s:%d", address, file, line));
+//     else Debug(LogMsg("Missing block: %lx", address));
+//   }
 
-  glfwUnlockMutex(mutex);
-}
+//   glfwUnlockMutex(mutex);
+// }
 
 
-//========================================================================
-// Replacements of global new & delete
-//========================================================================
+// //========================================================================
+// // Replacements of global new & delete
+// //========================================================================
 
-/**
- *  Replacement global new operator without location reporting.
- *  This catches calls which don't use NEW for some reason.
- */
-void* operator new(size_t size)
-{
-    return NewBlock(size);
-}
+// /**
+//  *  Replacement global new operator without location reporting.
+//  *  This catches calls which don't use NEW for some reason.
+//  */
+// void* operator new(size_t size)
+// {
+//     return NewBlock(size);
+// }
 
 
-/**
- *  from n_new()).
- */
-void* operator new(size_t size, const char* file, int line)
-{
-    return NewBlock(size, file, line);
-}
+// /**
+//  *  from n_new()).
+//  */
+// void* operator new(size_t size, const char* file, int line)
+// {
+//     return NewBlock(size, file, line);
+// }
 
 
-/**
- *  Replacement global new[] operator without location reporting.
- */
-void* operator new[](size_t size)
-{
-    return NewBlock(size);
-}
+// /**
+//  *  Replacement global new[] operator without location reporting.
+//  */
+// void* operator new[](size_t size)
+// {
+//     return NewBlock(size);
+// }
 
 
-/**
- *  Replacement global new[] operator with location reporting.
- */
-void* operator new[](size_t size, const char* file, int line)
-{
-    return NewBlock(size, file, line);
-}
+// /**
+//  *  Replacement global new[] operator with location reporting.
+//  */
+// void* operator new[](size_t size, const char* file, int line)
+// {
+//     return NewBlock(size, file, line);
+// }
 
 
-/**
- *  Replacement global delete operator.
- */
-void operator delete(void* p)
-{
-  DeleteBlock(p);
-}
+// /**
+//  *  Replacement global delete operator.
+//  */
+// void operator delete(void* p)
+// {
+//   DeleteBlock(p);
+// }
 
 
-/**
- *  Replacement global delete operator to match the new with location reporting.
- */
-void operator delete(void* p, const char* file, int line)
-{
-  DeleteBlock(p, file, line);
-}
+// /**
+//  *  Replacement global delete operator to match the new with location reporting.
+//  */
+// void operator delete(void* p, const char* file, int line)
+// {
+//   DeleteBlock(p, file, line);
+// }
 
 
-/**
- *  Replacement global delete[] operator.
- */
-void operator delete[](void* p)
-{
-  DeleteBlock(p);
-}
+// /**
+//  *  Replacement global delete[] operator.
+//  */
+// void operator delete[](void* p)
+// {
+//   DeleteBlock(p);
+// }
 
 
-/**
- * Replacement global delete[] operator to match the new with location reporting.
- */
-void operator delete[](void* p, const char* file, int line)
-{
-  DeleteBlock(p, file, line);
-}
+// /**
+//  * Replacement global delete[] operator to match the new with location reporting.
+//  */
+// void operator delete[](void* p, const char* file, int line)
+// {
+//   DeleteBlock(p, file, line);
+// }
 
 
-#endif
+// #endif
 
 //=========================================================================
 // END

@@ -4198,11 +4198,11 @@ void SetOrderVisibility(bool vis)
  *  @param w New width of the window.
  *  @param h New height of the window.
  */
-#ifdef NEW_GLFW3
+// #ifdef NEW_GLFW3
 void GLFWCALL SizeCallback(GLFWwindow* window, int w, int h)
-#else
-void GLFWCALL SizeCallback(int w, int h)
-#endif
+// #else
+// void GLFWCALL SizeCallback(int w, int h)
+// #endif
 {
   config.scr_width = w;
   config.scr_height = h;

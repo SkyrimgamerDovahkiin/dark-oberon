@@ -47,12 +47,12 @@ class TPOOL_ELEMENT;
 // Included files
 //========================================================================
 
-#ifdef NEW_GLFW3
 #include <glfw3.h>
-#include <tinycthread.h>
-#else
-#include <glfw.h>
-#endif
+// #include <tinycthread.h> // TODO: replace with C++ thread
+#include <thread>
+#include <condition_variable>
+#include <mutex>
+
 
 #include <string.h>
 #include "dologs.h"
@@ -90,11 +90,12 @@ private:
   int count;                         //!< Count of elements in pool.
   int critical_count;                //!< Minimal count of elements in pool.
   int increment_count;               //!< Count of elements which are added to pool when count <= crutical_count.
-#ifdef NEW_GLFW3
-	mtx_t mutex;
-#else
-	GLFWmutex mutex;                   //!< Pool mutex.
-#endif
+// #ifdef NEW_GLFW3
+// 	mtx_t mutex;
+// #else
+// 	GLFWmutex mutex;                   //!< Pool mutex.
+// #endif
+    std::mutex mutex; //!< Pool mutex.
   
 
 public:
@@ -126,15 +127,15 @@ private:
 template <class T>
 TPOOL<T>::TPOOL(int elements_count, int count_critical, int count_increment)
 {
-#ifdef NEW_GLFW3
+// #ifdef NEW_GLFW3
 	// create mutex
-  if ((mtx_init(&mutex, mtx_plain)) == thrd_error) 
-    Critical ("Could not create mutex");
-#else
-  // create mutex
-  if ((mutex = glfwCreateMutex ()) == NULL) 
-    Critical ("Could not create mutex");
-#endif
+  // if ((mtx_init(&mutex, mtx_plain)) == thrd_error)
+  //   Critical ("Could not create mutex");
+// #else
+//   // create mutex
+//   if ((mutex = glfwCreateMutex ()) == NULL)
+//     Critical ("Could not create mutex");
+// #endif
 
   count = 0;
   critical_count = count_critical;
@@ -334,7 +335,7 @@ TPOOL<T>* TPOOL<T>::CreateNewPool(int elements_count, int count_critical, int co
 }
 
 
-#endif // __dopool_h__
+#endif __dopool_h__
 
 
 //=========================================================================

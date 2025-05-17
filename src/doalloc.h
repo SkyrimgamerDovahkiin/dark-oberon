@@ -2,7 +2,7 @@
  * -------------
  *  Dark Oberon
  * -------------
- * 
+ *
  * An advanced strategy game.
  *
  * Copyright (C) 2002 - 2005 Valeria Sventova, Jiri Krejsa, Peter Knut,
@@ -24,62 +24,57 @@
  *  @date 2004
  */
 
-#ifndef __doalloc_h__
-#define __doalloc_h__
-
+#pragma once
 
 #include "cfg.h"
 
-#if DEBUG_MEMORY
+// #if DEBUG_MEMORY
 
-  #define NEW new(__FILE__,__LINE__)
+// #include "dologs.h"
+// #include <glfw3.h>
+// #include <crtdbg.h>
+// #include <malloc.h>
 
+// #define NEW new (__FILE__, __LINE__)
 
-//========================================================================
-// Operators
-//========================================================================
+// //========================================================================
+// // Operators
+// //========================================================================
 
-void* operator new(size_t size);
-void* operator new(size_t size, const char* file, int line);
-void* operator new[](size_t size);
-void* operator new[](size_t size, const char* file, int line);
+// void *operator new(size_t size);
+// void *operator new(size_t size, const char *file, int line);
+// void *operator new[](size_t size);
+// void *operator new[](size_t size, const char *file, int line);
 
-void operator delete(void* p);
-void operator delete(void* p, const char* /*file*/, int /*line*/);
-void operator delete[](void* p);
-void operator delete[](void* p, const char* /*file*/, int /*line*/);
+// void operator delete(void *p);
+// void operator delete(void *p, const char * /*file*/, int /*line*/);
+// void operator delete[](void *p);
+// void operator delete[](void *p, const char * /*file*/, int /*line*/);
 
+// //========================================================================
+// // Methods
+// //========================================================================
 
-//========================================================================
-// Methods
-//========================================================================
+// void InitMemorySestem(void);
+// void DoneMemorySystem(void);
+// void SetAllocLogging(bool log);
 
-void InitMemorySestem(void);
-void DoneMemorySystem(void);
-void SetAllocLogging(bool log);
+// #else // DEBUG_MEMORY
 
+#define NEW new
 
-#else // DEBUG_MEMORY
-
-  #define NEW new
-
-#endif // !DEBUG_MEMORY
-
+// #endif // !DEBUG_MEMORY
 
 //========================================================================
 // New operator for GUI
 //========================================================================
 
 #ifdef GUI_NEW
-  #undef GUI_NEW
+#undef GUI_NEW
 #endif
 #define GUI_NEW NEW
-
-
-#endif
 
 //=========================================================================
 // END
 //=========================================================================
 // vim:ts=2:sw=2:et:
-

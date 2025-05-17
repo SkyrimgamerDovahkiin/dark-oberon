@@ -5,6 +5,8 @@ clean:
 	cd src && make clean
 	rm -f doberon
 
+clean_build: clean build
+
 DESTDIR = dark-oberon-1.0.2-RC1
 
 prepare-release:

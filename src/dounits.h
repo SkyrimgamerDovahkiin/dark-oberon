@@ -559,7 +559,7 @@ public:
 protected:
   /** The method sets variable to will be deleted and delete unit. */
   virtual void UnitToDelete(bool lock) {
-  	
+
 #ifdef NEW_GLFW3
 	if (lock) mtx_lock(&delete_mutex);
 #else

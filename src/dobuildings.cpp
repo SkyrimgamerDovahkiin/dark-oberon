@@ -35,7 +35,7 @@
 #include "dosimpletypes.h"
 #include "dounits.h"
 #include "dopool.h"
-#include "dohost.h"
+// #include "dohost.h"
 
 
 //=========================================================================

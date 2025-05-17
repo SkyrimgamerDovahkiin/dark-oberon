@@ -38,8 +38,8 @@
 #include "dosimpletypes.h"
 #include "domouse.h"
 #include "dopool.h"
-#include "donet.h"
-#include "dohost.h"
+// #include "donet.h"
+// #include "dohost.h"
 #include "doengine.h"
 
 

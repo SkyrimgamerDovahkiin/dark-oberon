@@ -33,12 +33,8 @@
 // Included files
 //========================================================================
 
-#ifdef NEW_GLFW3
 #include <glfw3.h>
-#include <tinycthread.h>
-#else
-#include <glfw.h>
-#endif
+// #include <tinycthread.h> // TODO: replace with C++ thread
 
 #include "dopool.h"
 

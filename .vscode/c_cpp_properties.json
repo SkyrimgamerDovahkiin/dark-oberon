@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include/GLFW",
+                "${workspaceFolder}/libs/fmod3/include/**",
+                "${workspaceFolder}/libs/imgui/include/**",
+                "${workspaceFolder}/libs/GLAD/include/**",
+                "${workspaceFolder}/src/event/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

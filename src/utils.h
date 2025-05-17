@@ -41,14 +41,9 @@
 
 #include <string>
 
-#ifdef WINDOWS
-#  include <winsock.h>
-#  include <direct.h>
-#else
 #  include <unistd.h>
 #  include <sys/types.h>
 #  include <sys/stat.h>
-#endif
 
 
 //=========================================================================
@@ -56,20 +51,12 @@
 //=========================================================================
 
 inline int do_close (int fd) {
-#ifdef WINDOWS
-  return closesocket (fd);
-#else
   return close (fd);
-#endif
 }
 
 inline int do_mkdir (std::string path)
 {
-#ifdef WINDOWS
-  return _mkdir(path.c_str());
-#else
   return mkdir(path.c_str(), 0777);
-#endif
 }
 
 

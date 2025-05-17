@@ -35,11 +35,7 @@
 #include "cfg.h"
 #include "doalloc.h"
 
-#ifdef NEW_GLFW3
 #include <glfw3.h>
-#else
-#include <glfw.h>
-#endif
 
 
 //=========================================================================

@@ -19,9 +19,9 @@
  *
  *  Game declarations and methods.
  *
- *  @author Peter Knut
+ *  @author Peter Knut, Fabian Rubin
  *
- *  @date 2002, 2003
+ *  @date 2002, 2003, 2025
  */
 
 #ifndef __doconfig_h__
@@ -37,6 +37,8 @@ struct TCONFIG;
 //========================================================================
 // Definitions
 //========================================================================
+
+// TODO: move this stuff into a struct because i hate defines
 
 /** Filename of the configuration file.
  *  @sa DATA_DIR */
@@ -137,17 +139,13 @@ struct TCONFIG;
 // Included files
 //========================================================================
 
-#ifdef NEW_GLFW3
 #include <glfw3.h>
-#else
-#include <glfw.h>
-#endif
 
 #include "cfg.h"
 #include "doalloc.h"
 
 #include "dofile.h"
-#include "doplayers.h"
+// #include "doplayers.h"
 
 
 //========================================================================

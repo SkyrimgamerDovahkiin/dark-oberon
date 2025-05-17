@@ -38,34 +38,10 @@
 // TLOCK
 //=========================================================================
 
-TLOCK::TLOCK ()
-{
-  mutex = glfwCreateMutex ();
-
-  /* Throws an exception when mutex was not created. */
-  if (!mutex)
-    throw MutexException ();
-
-#if DEBUG
-  unlocked = glfwCreateCond ();
-
-  /* Throws an exception when mutex was not created. */
-  if (!unlocked)
-    throw MutexException ();
-
-  locked_by = -1;
-#endif
-}
+TLOCK::TLOCK () {} // no need to manually check if mutex/cond created
 
 
-TLOCK::~TLOCK ()
-{
-  glfwDestroyMutex (mutex);
-
-#if DEBUG
-  glfwDestroyCond (unlocked);
-#endif
-}
+TLOCK::~TLOCK () {} // no need to manually check if mutex/cond destroyed
 
 
 #if DEBUG
@@ -74,9 +50,11 @@ TLOCK::~TLOCK ()
  */
 void TLOCK::Lock ()
 {
-  GLFWthread myself = glfwGetThreadID ();
+  // TODO:
 
-  glfwLockMutex (mutex);
+  auto myself = std::this_thread::get_id();
+
+  mutex.lock();
 
   if (locked_by == myself) {
     /* Mutex is already locked by myself, you should consider using
@@ -84,14 +62,17 @@ void TLOCK::Lock ()
     throw MutexException ();
   }
 
-  /* wait until I can enter. */
-  while (locked_by != -1) {
-    glfwWaitCond (unlocked, mutex, GLFW_INFINITY);
-  }
+  /* wait until I can enter. */ // should work?
+  std::unique_lock<std::mutex> lock(mutex);
+  unlocked.wait(lock, [this] { return locked_by == std::thread::id{}; });
+
+  // while (locked_by != -1) {
+  //   glfwWaitCond (unlocked, mutex, GLFW_INFINITY);
+  // }
 
   locked_by = myself;
 
-  glfwUnlockMutex (mutex);
+  mutex.unlock();
 }
 #endif
 
@@ -101,11 +82,11 @@ void TLOCK::Lock ()
  */
 void TLOCK::Unlock ()
 {
-  glfwLockMutex (mutex);
+  mutex.lock();
 
-  GLFWthread myself = glfwGetThreadID ();
+  auto myself = std::this_thread::get_id();
 
-  if (locked_by == -1) {
+  if (locked_by == std::thread::id{}) {
     /* Mutex is not locked! Fix your bug. */
     throw MutexException ();
   }
@@ -115,14 +96,12 @@ void TLOCK::Unlock ()
     throw MutexException ();
   }
 
-  locked_by = -1;
+  locked_by = std::thread::id{};
 
-  glfwSignalCond (unlocked);
-
-  glfwUnlockMutex (mutex);
+  unlocked.notify_all(); // Notify all waiting threads, should work
+  mutex.unlock();
 }
 #endif
-
 
 //=========================================================================
 // TRECURSIVE_LOCK
@@ -135,21 +114,21 @@ void TLOCK::Unlock ()
  */
 TRECURSIVE_LOCK::TRECURSIVE_LOCK ()
 {
-  mutex = glfwCreateMutex ();
+  // mutex = glfwCreateMutex ();
+
+  // std::recursive_mutex mutex;
 
   /* Throws an exception when mutex was not created. */
-  if (!mutex)
-    throw MutexException ();
+  // if (!mutex)
+  //   throw MutexException ();
 
-  locked_by = -1;
+  // locked_by = -1;
+  locked_by = std::thread::id{};
   locked_count = 0;
 }
 
 
-TRECURSIVE_LOCK::~TRECURSIVE_LOCK ()
-{
-  glfwDestroyMutex (mutex);
-}
+TRECURSIVE_LOCK::~TRECURSIVE_LOCK () {} // no need to destroy mutex manually
 
 /**
  *  Locks the object to get exclusive access to it. Lock() can be called more
@@ -158,16 +137,16 @@ TRECURSIVE_LOCK::~TRECURSIVE_LOCK ()
  */
 void TRECURSIVE_LOCK::Lock ()
 {
-#if DEBUG
-  if (!mutex)
-    throw MutexException ();
-#endif
+// #if DEBUG
+//   if (!mutex)
+//     throw MutexException ();
+// #endif
 
-  GLFWthread myself = glfwGetThreadID ();
+  auto myself = std::this_thread::get_id();
 
   if (locked_by != myself)
   {
-    glfwLockMutex (mutex);
+    mutex.lock();
     locked_by = myself;
   }
 
@@ -182,7 +161,7 @@ void TRECURSIVE_LOCK::Lock ()
  */
 void TRECURSIVE_LOCK::Unlock ()
 {
-  GLFWthread myself = glfwGetThreadID ();
+  auto myself = std::this_thread::get_id();
 
   if (locked_by != myself) {
     throw MutexException ();
@@ -191,8 +170,8 @@ void TRECURSIVE_LOCK::Unlock ()
   locked_count--;
 
   if (!locked_count) {
-    locked_by = -1;
-    glfwUnlockMutex (mutex);
+    locked_by = std::thread::id{};
+    mutex.unlock();
   }
 }
 
@@ -210,7 +189,7 @@ TRECURSIVE_LOCK *process_mutex;
 //=========================================================================
 
 void init_giant () {
-  giant = NEW TRECURSIVE_LOCK ();
+  giant = new TRECURSIVE_LOCK ();
 }
 
 //=========================================================================

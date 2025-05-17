@@ -28,9 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dofile.h"
+// #include "dofile.h"
 #include "doconfig.h"
-#include "doengine.h"
+// #include "doengine.h"
 
 
 //========================================================================
@@ -350,7 +350,7 @@ bool LoadConfig(void)
 
   // Networking options.
   config.file->ReadIntRange(&config.net_server_port, const_cast<char*>("net_server_port"), 1024, 65535, CFG_DEF_NET_SERVER_PORT);
-  
+
   ComputePrecompiled();
 
   return true;

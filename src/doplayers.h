@@ -78,7 +78,6 @@ class TCOMPUTER_PLAYER;
 #include <string>
 
 #include "doipc.h"
-#include "donet.h"
 #include "dowalk.h"
 
 //=========================================================================
